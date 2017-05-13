@@ -3,6 +3,7 @@ package com.niit.controller;
 import java.util.List;
 
 import javax.security.auth.message.callback.PrivateKeyCallback.Request;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.niit.collaboration.dao.BlogDAO;
 import com.niit.collaboration.model.Blog;
+import com.niit.collaboration.model.User;
 
 @RestController
 public class BlogController {
@@ -28,6 +30,12 @@ public class BlogController {
 	@Autowired
 	private BlogDAO blogDAO;
 
+	@Autowired
+	private User user;
+	
+	@Autowired
+	private HttpSession session;
+	
 	@GetMapping("helloblog")
 	public String blogHelloUser() {
 		return "Hello Blog Controller";
@@ -60,6 +68,8 @@ public class BlogController {
 	@RequestMapping(value = "blog/create", method = RequestMethod.POST)
 	public ResponseEntity<Blog> createBlog(@RequestBody Blog blog) {
 
+		user = (User) session.getAttribute("user");
+		blog.setUser_id(user.getId());
 		if (blogDAO.getBlogById(blog.getId()) == null) {
 			if (blogDAO.save(blog) == true) {
 				blog.setErrorCode("200");
@@ -78,6 +88,9 @@ public class BlogController {
 	@RequestMapping(value = "blog/update", method = RequestMethod.PUT)
 	public ResponseEntity<Blog> updateBlog(@RequestBody Blog blog) {
 
+		//user = (User) session.getAttribute("user");
+		//blog.setUser_id(user.getId());
+		
 		if (blogDAO.getBlogById(blog.getId()) != null) {
 			if (blogDAO.update(blog) == true) {
 				blog.setErrorCode("200");

@@ -41,6 +41,10 @@ public class UserController {
 		return "Hellosssssssss"+user.getId();
 
 	}
+	@GetMapping("/user/logout")
+	public void logoutUser(){
+		session.invalidate();
+	}
 
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	public ResponseEntity<List<User>> getAllUser() {
