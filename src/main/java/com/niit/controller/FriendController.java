@@ -128,4 +128,59 @@ public class FriendController {
 		return new ResponseEntity<List<Friend>>(myFriends, HttpStatus.OK);
 	}
 
+	
+
+	@RequestMapping(value = "/accepttFriend/{friendID}", method = RequestMethod.PUT)
+	public ResponseEntity<Friend> acceptFriendFriendRequest(@PathVariable("friendID") String friendID) {
+		logger.debug("->->->->calling method acceptFriendFriendRequest");
+        
+		friend = updateRequest(friendID, 'Y');
+		return new ResponseEntity<Friend>(friend, HttpStatus.OK);
+
+	}
+	
+	private Friend updateRequest(String friendID, char status) {
+		logger.debug("Starting of the method updateRequest");
+		user = (User) session.getAttribute("user");
+		String loggedInUserID = user.getId();
+		logger.debug("loggedInUserID : " + loggedInUserID);
+		
+		if(isFriendRequestAvailabe(friendID)==false)
+		{
+			friend.setErrorCode("404");
+			friend.setErrorMessage("The request does not exist.  So you can not update to "+status);
+		}
+		
+		
+		else
+			friend = friendDAO.get(loggedInUserID, friendID);
+		friend.setStatus(status); // N - New, R->Rejected, A->Accepted
+
+		friendDAO.update(friend);
+
+		friend.setErrorCode("200");
+		friend.setErrorMessage(
+				"Request from   " + friend.getUser_id() + " To " + friend.getFriend_id() + " has updated to :" + status);
+		logger.debug("Ending of the method updateRequest");
+		return friend;
+
+	}
+	private boolean isFriendRequestAvailabe(String friendID)
+	{
+		user = (User) session.getAttribute("user");
+		String loggedInUserID = user.getId();
+		
+		if(friendDAO.get(loggedInUserID,friendID)==null)
+			return false;
+		else
+			return true;
+	}
+	
+	@RequestMapping(value = "/unFriend/{friendID}", method = RequestMethod.PUT)
+	public ResponseEntity<Friend> unFriend(@PathVariable("friendID") String friendID) {
+		logger.debug("->->->->calling method unFriend");
+		updateRequest(friendID, 'U');
+		return new ResponseEntity<Friend>(friend, HttpStatus.OK);
+
+	}
 }
