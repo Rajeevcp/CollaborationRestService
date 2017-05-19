@@ -183,4 +183,13 @@ public class FriendController {
 		return new ResponseEntity<Friend>(friend, HttpStatus.OK);
 
 	}
+	
+	@RequestMapping(value = "/rejectFriend/{friendID}", method = RequestMethod.PUT)
+	public ResponseEntity<Friend> rejectFriendFriendRequest(@PathVariable("friendID") String friendID) {
+		logger.debug("->->->->calling method rejectFriendFriendRequest");
+
+		updateRequest(friendID, 'C');
+		return new ResponseEntity<Friend>(friend, HttpStatus.OK);
+
+	}
 }
