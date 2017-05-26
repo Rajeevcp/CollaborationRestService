@@ -1,5 +1,6 @@
 package com.niit.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -11,11 +12,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.niit.collaboration.dao.UserDAO;
@@ -32,17 +35,18 @@ public class UserController {
 
 	@Autowired
 	private HttpSession session;
-	
+
 	@GetMapping("/hello")
 	public String printWelcome() {
 		System.out.println("Started");
 		// ModelAndView mv = new ModelAndView("/foo");
 		user = (User) session.getAttribute("user");
-		return "Hellosssssssss"+user.getId();
+		return "Hellosssssssss" + user.getId();
 
 	}
+
 	@GetMapping("/user/logout")
-	public void logoutUser(){
+	public void logoutUser() {
 		session.invalidate();
 	}
 
@@ -50,7 +54,7 @@ public class UserController {
 	public ResponseEntity<List<User>> getAllUser() {
 		List<User> userList = userDAO.list();
 		user = (User) session.getAttribute("user");
-		System.out.println("given id is "+user.getId());
+		System.out.println("given id is " + user.getId());
 		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
 	}
 
@@ -123,5 +127,25 @@ public class UserController {
 		user.setErrorCode("404");
 		user.setErrorMessage("User already exist with id : " + user.getId());
 		return new ResponseEntity<User>(user, HttpStatus.OK);
+	}
+
+	@PostMapping("/imageUpload")
+	public void ImageUpload(@RequestBody MultipartFile file, HttpSession session) throws IOException {
+
+		user = (User) session.getAttribute("user");
+		String username = user.getId(); /* Get Logged in Username */
+		/* Get user object based on username */
+		System.out.println(file.getContentType() + '\n' + file.getName() + '\n' + file.getSize() + '\n'
+				+ file.getOriginalFilename());
+		user.setImage(file.getBytes());
+		userDAO.update(user);
+	}
+
+	@GetMapping("/myProfile")
+	public ResponseEntity<User> profileimage(HttpSession session) {
+		user = (User) session.getAttribute("user");
+		String uid = user.getId();
+		User users = userDAO.get(uid);
+		return new ResponseEntity<User>(users, HttpStatus.OK);
 	}
 }
