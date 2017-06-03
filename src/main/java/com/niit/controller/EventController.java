@@ -16,6 +16,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,7 @@ import com.niit.collaboration.dao.EventDAO;
 import com.niit.collaboration.dao.UserDAO;
 import com.niit.collaboration.model.Blog;
 import com.niit.collaboration.model.Event;
+import com.niit.collaboration.model.Job;
 import com.niit.collaboration.model.JobApplication;
 import com.niit.collaboration.model.User;
 
@@ -78,6 +81,38 @@ public class EventController {
 
 	}
 	
+	@GetMapping("event/{id}")
+	public ResponseEntity<Event> getEventById(@PathVariable("id") String event_id) {
+		event = eventDAO.getEventById(event_id);
+
+		if (event != null) {
+			event.setErrorCode("200");
+			event.setErrorMessage("Event found");
+
+		} else {
+			event = new Event();
+			event.setErrorCode("404");
+			event.setErrorMessage("Event not found with this id " + event_id);
+		}
+		return new ResponseEntity<Event>(event, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping("event/update")
+	public ResponseEntity<Event> updateJob(@RequestBody Event event) {
+		
+			if (eventDAO.update(event) == true) {
+				event.setErrorCode("200");
+				event.setErrorMessage("Event Updated");
+
+			} else {
+				event.setErrorCode("404");
+				event.setErrorMessage("Event Updation Failed");
+			}
+			return new ResponseEntity<Event>(event, HttpStatus.OK);
+		
+	
+	}
 	
 	
 

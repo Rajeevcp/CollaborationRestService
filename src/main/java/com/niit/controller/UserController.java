@@ -54,7 +54,7 @@ public class UserController {
 	public ResponseEntity<List<User>> getAllUser() {
 		List<User> userList = userDAO.list();
 		user = (User) session.getAttribute("user");
-		System.out.println("given id is " + user.getId());
+		//System.out.println("given id is " + user.getId());
 		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
 	}
 
